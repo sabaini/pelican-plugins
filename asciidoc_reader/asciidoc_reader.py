@@ -34,6 +34,7 @@ class AsciiDocReader(BaseReader):
 
     def read(self, source_path):
         """Parse content and metadata of asciidoc files"""
+        #import pdb;pdb.set_trace()
         from cStringIO import StringIO
         with pelican_open(source_path) as source:
             text = StringIO(source.encode('utf8'))
@@ -54,7 +55,11 @@ class AsciiDocReader(BaseReader):
             if value is None:
                 continue
             name = name.lower()
-            metadata[name] = self.process_metadata(name, six.text_type(value))
+            try:
+                value = six.text_type(value, 'utf-8')
+            except TypeError: # could already be unicode()
+                pass
+            metadata[name] = self.process_metadata(name, value)
         if 'doctitle' in metadata:
             metadata['title'] = metadata['doctitle']
         return content, metadata
